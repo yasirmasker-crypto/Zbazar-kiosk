@@ -4,386 +4,208 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Z-Bazar AI Helper</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f0f4ff;
+  --surface:#ffffff;
+  --surface2:#e4eeff;
+  --border:rgba(0,50,210,0.13);
+  --border2:rgba(0,50,210,0.25);
+  --accent:#0032d6;
+  --accent-pale:#e4eeff;
+  --text:#06102a;
+  --muted:#3a4e70;
+  --muted2:#8a9eb8;
+  --font-d:'Syne',sans-serif;
+  --font-b:'DM Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);height:100vh;overflow:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,50,210,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,50,210,0.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0;}
 
-  :root {
-    --bg: #f0f5ff;
-    --surface: #ffffff;
-    --surface2: #e4eeff;
-    --border: rgba(0,60,200,0.1);
-    --border2: rgba(0,60,200,0.22);
-    --accent: #0040cc;
-    --accent-light: #1a55e0;
-    --accent-pale: #e4eeff;
-    --text: #080f26;
-    --muted: #3a4e70;
-    --muted2: #7a8fb0;
-    --font-display: 'Syne', sans-serif;
-    --font-body: 'DM Sans', sans-serif;
-  }
+/* ── SETUP ── */
+#setup{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+#setup.hidden{display:none;}
+.setup-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:18px;box-shadow:0 6px 40px rgba(0,50,210,0.1);}
+.setup-card h2{font-family:var(--font-d);font-size:22px;font-weight:700;}
+.setup-card p{font-size:15px;color:var(--muted);line-height:1.6;}
+.setup-card a{color:var(--accent);text-decoration:none;font-weight:600;}
+.setup-card label{font-size:13px;color:var(--muted);font-weight:500;}
+.setup-card input{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:13px 16px;color:var(--text);font-size:16px;outline:none;width:100%;font-family:var(--font-b);transition:border-color .2s;}
+.setup-card input:focus{border-color:var(--accent);}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    height: 100vh;
-    overflow: hidden;
-  }
+/* ── PAGE ── */
+.page{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;padding:14px 20px 10px;gap:10px;}
 
-  /* subtle grid bg */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,80,180,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,80,180,0.035) 1px, transparent 1px);
-    background-size: 36px 36px;
-    pointer-events: none;
-    z-index: 0;
-  }
+/* ── HEADER ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-mark{width:46px;height:46px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,50,210,0.3);flex-shrink:0;}
+.logo-name{font-family:var(--font-d);font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--accent);line-height:1;}
+.logo-name span{color:var(--text);}
+.logo-ku{font-size:13px;color:var(--muted);direction:rtl;}
+.store-badge{background:var(--accent);color:#fff;font-family:var(--font-d);font-size:14px;font-weight:700;padding:6px 16px;border-radius:20px;}
+.top-right{display:flex;align-items:center;gap:10px;}
+.key-btn{background:transparent;border:1px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--muted);font-size:13px;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
+.key-btn:hover{border-color:var(--accent);color:var(--accent);}
 
-  /* ═══════════════ LAYOUT ═══════════════ */
+/* ── MAIN ── */
+.main{flex:1;display:grid;grid-template-columns:260px 1fr;gap:14px;min-height:0;}
 
-  .page {
-    position: relative;
-    z-index: 1;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 18px 28px 12px;
-    gap: 14px;
-  }
+/* ── LEFT ── */
+.left{display:flex;flex-direction:column;gap:10px;min-height:0;}
 
-  /* ── HEADER ── */
-  .top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
+.scan-zone{background:var(--surface);border:2px solid var(--border2);border-radius:18px;overflow:hidden;cursor:pointer;transition:border-color .3s,box-shadow .3s;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:170px;box-shadow:0 2px 14px rgba(0,50,210,0.07);}
+.scan-zone:hover{border-color:var(--accent);box-shadow:0 4px 22px rgba(0,50,210,0.14);}
+.scan-idle{display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 16px;text-align:center;}
+.scan-idle-icon{width:62px;height:62px;background:var(--accent-pale);border-radius:16px;display:flex;align-items:center;justify-content:center;border:2px solid rgba(0,50,210,0.15);animation:breathe 3s ease-in-out infinite;}
+@keyframes breathe{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,50,210,0.15)}50%{transform:scale(1.04);box-shadow:0 0 0 10px rgba(0,50,210,0)}}
+.scan-idle h2{font-family:var(--font-d);font-size:22px;font-weight:800;color:var(--accent);}
+.scan-idle p{font-size:14px;color:var(--muted);line-height:1.5;}
+#camera-view{position:relative;width:100%;display:none;}
+#camera-view.active{display:block;}
+#camera-view video{width:100%;max-height:180px;object-fit:cover;display:block;}
+#camera-view canvas{display:none!important;}
+.scan-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.scan-reticle{width:160px;height:60px;border:2px solid var(--accent);border-radius:8px;position:relative;box-shadow:0 0 0 2000px rgba(255,255,255,0.45);}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:var(--accent);animation:scanLine 2s ease-in-out infinite;box-shadow:0 0 6px var(--accent);}
+@keyframes scanLine{0%,100%{top:10%;opacity:1}50%{top:88%;opacity:.6}}
+.mode-strip{display:none;gap:6px;padding:6px 10px 8px;}
+.mode-strip.visible{display:flex;}
+.mode-btn{flex:1;padding:7px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;transition:all .2s;font-family:var(--font-b);}
+.mode-btn.active{background:var(--accent-pale);border-color:var(--accent);color:var(--accent);font-weight:600;}
+.mode-btn.stop{flex:0;padding:7px 11px;color:#c0392b;border-color:rgba(192,57,43,.3);}
+.manual-wrap{display:none;padding:0 10px 10px;gap:7px;}
+.manual-wrap.active{display:flex;}
+.manual-wrap input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:9px 12px;color:var(--text);font-size:16px;outline:none;transition:border-color .2s;font-family:var(--font-b);}
+.manual-wrap input:focus{border-color:var(--accent);}
+.btn-go{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-family:var(--font-d);font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;}
 
-  .logo { display: flex; align-items: center; gap: 14px; }
+.status-bar{text-align:center;font-size:14px;color:var(--muted);min-height:20px;flex-shrink:0;}
+.status-bar.error{color:#c0392b;}
+.status-bar.success{color:var(--accent);font-weight:600;}
 
-  .logo-mark {
-    width: 52px; height: 52px;
-    background: var(--accent);
-    border-radius: 13px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 16px rgba(0,80,180,0.28);
-    flex-shrink: 0;
-  }
+/* product summary */
+.product-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:14px;display:none;flex-direction:column;gap:8px;box-shadow:0 2px 12px rgba(0,50,210,0.06);flex:1;min-height:0;}
+.product-card.active{display:flex;}
+.product-header{display:flex;gap:10px;align-items:flex-start;}
+.product-thumb{width:58px;height:58px;border-radius:11px;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+.product-thumb img{width:100%;height:100%;object-fit:contain;}
+.product-name{font-family:var(--font-d);font-size:18px;font-weight:700;color:var(--text);line-height:1.2;}
+.product-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.badge-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;}
+.badge{padding:3px 8px;border-radius:5px;font-size:12px;font-weight:600;border:1px solid;}
+.badge-green{color:#1a7a3c;border-color:rgba(26,122,60,.25);background:rgba(26,122,60,.08);}
+.badge-blue{color:var(--accent);border-color:rgba(0,50,210,.25);background:var(--accent-pale);}
+.badge-amber{color:#b06000;border-color:rgba(176,96,0,.25);background:rgba(176,96,0,.08);}
+.scan-again-btn{background:var(--accent-pale);border:1.5px solid var(--accent);border-radius:9px;padding:9px;color:var(--accent);font-family:var(--font-d);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;flex-shrink:0;}
+.scan-again-btn:hover{background:var(--accent);color:#fff;}
 
-  .logo-text-wrap { display: flex; flex-direction: column; gap: 1px; }
-  .logo-name { font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: var(--accent); line-height: 1; }
-  .logo-name span { color: var(--text); }
-  .logo-kurdish { font-size: 20px; color: var(--muted); direction: rtl; }
+/* ── RIGHT ── */
+.right{display:none;flex-direction:column;gap:10px;min-height:0;animation:fadeUp .4s ease both;}
+.right.active{display:flex;}
 
-  .store-badge {
-    background: var(--accent);
-    color: #fff;
-    font-family: var(--font-display);
-    font-size: 18px; font-weight: 700;
-    padding: 8px 20px; border-radius: 20px;
-    letter-spacing: 0.06em;
-  }
+/* tags */
+.tags-card{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 10px rgba(0,50,210,0.05);flex-shrink:0;}
+.tags-label{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700;}
+.tags-row{display:flex;flex-wrap:wrap;gap:7px;}
+.tag{padding:5px 14px;border-radius:20px;font-size:15px;font-weight:600;border:1.5px solid;}
+.tag-green{color:#166534;border-color:rgba(22,101,52,.3);background:rgba(22,101,52,.08);}
+.tag-blue{color:var(--accent);border-color:rgba(0,50,210,.3);background:var(--accent-pale);}
+.tag-amber{color:#92400e;border-color:rgba(146,64,14,.3);background:rgba(146,64,14,.08);}
+.tag-purple{color:#6b21a8;border-color:rgba(107,33,168,.3);background:rgba(107,33,168,.08);}
+.tag-red{color:#991b1b;border-color:rgba(153,27,27,.3);background:rgba(153,27,27,.08);}
+.tag-teal{color:#0f766e;border-color:rgba(15,118,110,.3);background:rgba(15,118,110,.08);}
 
-  .top-right { display: flex; align-items: center; gap: 12px; }
-  .change-key-btn {
-    background: transparent; border: 1px solid var(--border2);
-    border-radius: 8px; padding: 6px 12px;
-    color: var(--muted); font-size: 16px; cursor: pointer;
-    font-family: var(--font-body);
-    transition: all 0.2s;
-  }
-  .change-key-btn:hover { border-color: var(--accent); color: var(--accent); }
+/* main blurb card */
+.blurb-card{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 10px rgba(0,50,210,0.05);flex:1;min-height:0;overflow-y:auto;}
 
-  /* ── MAIN AREA ── */
-  .main-area {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 16px;
-    min-height: 0;
-  }
+.section{display:flex;flex-direction:column;gap:6px;}
+.section-label{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700;direction:rtl;text-align:right;}
+.section-text{font-size:20px;color:var(--text);line-height:1.75;direction:rtl;text-align:right;}
+.chip-list{display:flex;flex-wrap:wrap;gap:7px;direction:rtl;align-content:flex-start;}
+.chip{background:var(--surface2);border:1px solid var(--border2);border-radius:16px;padding:6px 14px;font-size:17px;color:var(--text);}
+.chip-accent{background:var(--accent-pale);border-color:rgba(0,50,210,.28);color:var(--accent);font-weight:500;}
+.divider{border:none;border-top:1px solid var(--border);margin:2px 0;}
 
-  /* ── LEFT PANEL ── */
-  .left-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-height: 0;
-  }
+/* ── CHAT ── */
+.chat-section{display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+.chat-messages{display:flex;flex-direction:column;gap:8px;max-height:140px;overflow-y:auto;}
+.chat-bubble{padding:10px 14px;border-radius:12px;font-size:17px;line-height:1.6;direction:rtl;text-align:right;max-width:90%;align-self:flex-start;}
+.chat-bubble.user{background:var(--accent);color:#fff;align-self:flex-end;direction:rtl;}
+.chat-bubble.ai{background:var(--surface2);color:var(--text);border:1px solid var(--border2);}
+.chat-bubble.thinking{color:var(--muted);font-style:italic;}
+.chat-input-row{display:flex;gap:8px;}
+.chat-input{flex:1;background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-size:17px;outline:none;transition:border-color .2s;font-family:var(--font-b);direction:rtl;}
+.chat-input:focus{border-color:var(--accent);}
+.chat-send{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-family:var(--font-d);font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+.chat-send:hover{opacity:.88;}
+.chat-send:disabled{opacity:.45;cursor:not-allowed;}
 
-  /* scan zone */
-  .scan-zone {
-    background: var(--surface);
-    border: 2px solid var(--border2);
-    border-radius: 20px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-    box-shadow: 0 2px 16px rgba(0,80,180,0.07);
-  }
-  .scan-zone:hover { border-color: var(--accent); box-shadow: 0 4px 24px rgba(0,80,180,0.14); }
+/* skeleton */
+.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,#f0f5ff 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:5px;height:20px;margin-bottom:8px;}
+.skeleton:last-child{width:55%;margin-bottom:0;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-  .scan-idle {
-    display: flex; flex-direction: column;
-    align-items: center; gap: 12px;
-    padding: 28px 20px; text-align: center;
-  }
-  .scan-idle-icon {
-    width: 72px; height: 72px;
-    background: var(--accent-pale);
-    border-radius: 18px;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px solid rgba(0,80,180,0.14);
-    animation: breathe 3s ease-in-out infinite;
-  }
-  @keyframes breathe {
-    0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(0,80,180,0.15)}
-    50%{transform:scale(1.04);box-shadow:0 0 0 12px rgba(0,80,180,0)}
-  }
-  .scan-idle h2 { font-family: var(--font-display); font-size: 34px; font-weight: 800; color: var(--accent); }
-  .scan-idle p { font-size: 18px; color: var(--muted); line-height: 1.5; }
+/* btn-primary */
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:11px;padding:14px;font-family:var(--font-d);font-size:17px;font-weight:700;cursor:pointer;width:100%;box-shadow:0 4px 14px rgba(0,50,210,.25);transition:opacity .15s,transform .15s;}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);}
 
-  #camera-view { position: relative; width: 100%; display: none; }
-  #camera-view.active { display: block; }
-  #camera-view video { width: 100%; max-height: 220px; object-fit: cover; display: block; }
-  #camera-view canvas { display: none !important; }
-  .scan-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-  .scan-reticle { width: 180px; height: 70px; border: 2px solid var(--accent); border-radius: 8px; position: relative; box-shadow: 0 0 0 2000px rgba(255,255,255,0.45); }
-  .scan-line { position: absolute; left:0; right:0; height: 2px; background: var(--accent); animation: scanLine 2s ease-in-out infinite; box-shadow: 0 0 6px var(--accent); }
-  @keyframes scanLine { 0%,100%{top:10%;opacity:1} 50%{top:88%;opacity:0.6} }
-
-  .mode-strip { display: none; gap: 8px; padding: 8px 12px 10px; }
-  .mode-strip.visible { display: flex; }
-  .mode-btn { flex:1; padding: 8px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--muted); font-size: 17px; cursor: pointer; transition: all 0.2s; font-family: var(--font-body); }
-  .mode-btn.active { background: var(--accent-pale); border-color: var(--accent); color: var(--accent); font-weight: 600; }
-  .mode-btn.stop { flex:0; padding: 8px 12px; color: #c0392b; border-color: rgba(192,57,43,0.3); }
-
-  .manual-wrap { display: none; padding: 0 12px 12px; gap: 8px; }
-  .manual-wrap.active { display: flex; }
-  .manual-wrap input { flex:1; background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 10px 13px; color: var(--text); font-size: 21px; outline: none; transition: border-color 0.2s; font-family: var(--font-body); }
-  .manual-wrap input:focus { border-color: var(--accent); }
-  .btn-go { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-family: var(--font-display); font-weight: 700; font-size: 19px; cursor: pointer; white-space: nowrap; }
-
-  /* product card */
-  .product-card {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 18px;
-    padding: 18px;
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    box-shadow: 0 2px 14px rgba(0,80,180,0.06);
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-  }
-  .product-card.active { display: flex; }
-
-  .product-thumb {
-    width: 64px; height: 64px;
-    border-radius: 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden; flex-shrink: 0;
-  }
-  .product-thumb img { width: 100%; height: 100%; object-fit: contain; }
-
-  .product-header { display: flex; gap: 12px; align-items: flex-start; }
-  .product-meta { flex: 1; }
-  .product-name { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.25; }
-  .product-sub { font-size: 19px; color: var(--muted); margin-top: 3px; }
-
-  .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-  .badge { padding: 3px 9px; border-radius: 6px; font-size: 17px; font-weight: 600; border: 1px solid; }
-  .badge-green { color: #1a7a3c; border-color: rgba(26,122,60,0.25); background: rgba(26,122,60,0.08); }
-  .badge-blue { color: var(--accent); border-color: rgba(0,80,180,0.25); background: var(--accent-pale); }
-  .badge-amber { color: #b06000; border-color: rgba(176,96,0,0.25); background: rgba(176,96,0,0.08); }
-
-  .scan-again-btn {
-    background: var(--accent-pale); border: 1.5px solid var(--accent);
-    border-radius: 10px; padding: 10px;
-    color: var(--accent); font-family: var(--font-display);
-    font-size: 22px; font-weight: 700; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: all 0.2s; flex-shrink: 0;
-  }
-  .scan-again-btn:hover { background: var(--accent); color: #fff; }
-
-  .status-bar { text-align: center; font-size: 17px; color: var(--muted); min-height: 24px; flex-shrink: 0; }
-  .status-bar.error { color: #c0392b; }
-  .status-bar.success { color: var(--accent); font-weight: 600; }
-
-  /* ── RIGHT PANEL ── */
-  .right-panel {
-    display: none;
-    grid-template-rows: auto 1fr;
-    gap: 12px;
-    min-height: 0;
-    animation: fadeUp 0.45s ease both;
-  }
-  .right-panel.active { display: grid; }
-
-  /* tags row */
-  .tags-card {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 16px;
-    padding: 14px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    box-shadow: 0 2px 12px rgba(0,80,180,0.05);
-  }
-  .tags-card .card-label { font-size: 17px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; }
-  .tags-row { display: flex; flex-wrap: wrap; gap: 7px; }
-  .tag {
-    padding: 5px 13px; border-radius: 20px;
-    font-size: 20px; font-weight: 600;
-    border: 1.5px solid;
-    transition: transform 0.15s;
-  }
-  .tag:hover { transform: translateY(-1px); }
-  .tag-green { color: #166534; border-color: rgba(22,101,52,0.3); background: rgba(22,101,52,0.08); }
-  .tag-blue { color: var(--accent); border-color: rgba(0,80,180,0.3); background: var(--accent-pale); }
-  .tag-amber { color: #92400e; border-color: rgba(146,64,14,0.3); background: rgba(146,64,14,0.08); }
-  .tag-purple { color: #6b21a8; border-color: rgba(107,33,168,0.3); background: rgba(107,33,168,0.08); }
-  .tag-red { color: #991b1b; border-color: rgba(153,27,27,0.3); background: rgba(153,27,27,0.08); }
-  .tag-teal { color: #0f766e; border-color: rgba(15,118,110,0.3); background: rgba(15,118,110,0.08); }
-
-  /* info cards grid */
-  .cards-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 1fr;
-    gap: 12px;
-    min-height: 0;
-    overflow-y: auto;
-  }
-
-  .info-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px 18px;
-    display: flex; flex-direction: column; gap: 8px;
-    box-shadow: 0 2px 10px rgba(0,80,180,0.04);
-    overflow: hidden;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    min-height: 0;
-  }
-  .info-card:hover { border-color: var(--border2); box-shadow: 0 4px 18px rgba(0,80,180,0.09); }
-  .info-card.full-width { grid-column: 1 / -1; }
-
-  .card-label {
-    font-size: 17px; text-transform: uppercase;
-    letter-spacing: 0.09em; color: var(--accent);
-    font-weight: 700; direction: rtl; text-align: right;
-    flex-shrink: 0;
-  }
-  .card-content {
-    font-size: 22px; color: var(--text); line-height: 1.75;
-    direction: rtl; text-align: right;
-    overflow-y: auto; flex: 1;
-  }
-  .chip-list { display: flex; flex-wrap: wrap; gap: 7px; direction: rtl; overflow-y: auto; align-content: flex-start; }
-  .chip { background: var(--surface2); border: 1px solid var(--border2); border-radius: 16px; padding: 5px 13px; font-size: 20px; color: var(--text); }
-  .chip-accent { background: var(--accent-pale); border-color: rgba(0,80,180,0.28); color: var(--accent); font-weight: 500; }
-
-  /* skeleton */
-  .skeleton { background: linear-gradient(90deg,var(--surface2) 25%,#f0f6ff 50%,var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 5px; height: 13px; margin-bottom: 6px; }
-  .skeleton:last-child { width: 55%; margin-bottom:0; }
-  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
-  /* setup screen */
-  #setup-screen { position: fixed; inset: 0; z-index: 10; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
-  #setup-screen.hidden { display: none; }
-
-  .setup-card { width: 100%; max-width: 500px; background: var(--surface); border: 1px solid var(--border2); border-radius: 22px; padding: 40px; display: flex; flex-direction: column; gap: 22px; box-shadow: 0 6px 40px rgba(0,80,180,0.1); }
-  .setup-card h2 { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
-  .setup-card p { font-size: 15px; color: var(--muted); line-height: 1.6; }
-  .setup-card a { color: var(--accent); text-decoration: none; font-weight: 500; }
-  .api-input-wrap { display: flex; flex-direction: column; gap: 8px; }
-  .api-input-wrap label { font-size: 14px; color: var(--muted); font-weight: 500; }
-  .api-input-wrap input { background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px; padding: 14px 18px; color: var(--text); font-size: 16px; outline: none; transition: border-color 0.2s; width: 100%; font-family: var(--font-body); }
-  .api-input-wrap input:focus { border-color: var(--accent); }
-  .btn-primary { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 15px; font-family: var(--font-display); font-size: 17px; font-weight: 700; cursor: pointer; width: 100%; box-shadow: 0 4px 16px rgba(0,80,180,0.25); transition: opacity 0.15s, transform 0.15s; }
-  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-
-  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
-<!-- SETUP SCREEN -->
-<div id="setup-screen">
-  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:8px;">
-    <div style="display:flex;align-items:center;gap:14px;">
-      <div class="logo-mark"><svg width="30" height="30" viewBox="0 0 34 34" fill="none"><rect x="2" y="6" width="3" height="22" rx="1" fill="white"/><rect x="7" y="6" width="1.5" height="22" fill="white"/><rect x="10" y="6" width="3" height="22" rx="1" fill="white"/><rect x="15" y="6" width="1.5" height="22" fill="white"/><rect x="18" y="6" width="4" height="22" rx="1" fill="white"/><rect x="24" y="6" width="1.5" height="22" fill="white"/><rect x="27" y="6" width="3" height="22" rx="1" fill="white"/></svg></div>
-      <div><div class="logo-name">Z-Bazar <span>AI Helper</span></div><div class="logo-kurdish">هاریکارێ زاخو بازار یێ ژیر</div></div>
-    </div>
+<!-- SETUP -->
+<div id="setup">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+    <div class="logo-mark"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><rect x="2" y="6" width="3" height="22" rx="1" fill="white"/><rect x="7" y="6" width="1.5" height="22" fill="white"/><rect x="10" y="6" width="3" height="22" rx="1" fill="white"/><rect x="15" y="6" width="1.5" height="22" fill="white"/><rect x="18" y="6" width="4" height="22" rx="1" fill="white"/><rect x="24" y="6" width="1.5" height="22" fill="white"/><rect x="27" y="6" width="3" height="22" rx="1" fill="white"/></svg></div>
+    <div><div class="logo-name">Z-Bazar <span>AI Helper</span></div><div class="logo-ku">هاریکارێ زاخو بازار یێ ژیر</div></div>
   </div>
   <div class="setup-card">
     <h2>Enter your API key to start</h2>
-    <p>Z-Bazar AI Helper uses Gemini to generate product insights. Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>. Saved locally on this device only.</p>
-    <div class="api-input-wrap">
+    <p>Get a free Gemini key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>. Saved on this device only.</p>
+    <div style="display:flex;flex-direction:column;gap:6px;">
       <label>Gemini API Key</label>
-      <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off" onkeydown="if(event.key==='Enter')saveKey()" />
+      <input type="password" id="api-key-input" placeholder="AIza..." onkeydown="if(event.key==='Enter')saveKey()"/>
     </div>
     <button class="btn-primary" onclick="saveKey()">Start Kiosk →</button>
   </div>
-  <p style="font-size:16px;color:var(--muted2);">Key is stored in your browser only — never shared.</p>
+  <p style="font-size:12px;color:var(--muted2);">Key stored locally — never shared.</p>
 </div>
 
-<!-- MAIN KIOSK -->
+<!-- KIOSK -->
 <div class="page">
-
   <div class="top-bar">
     <div class="logo">
-      <div class="logo-mark">
-        <svg width="30" height="30" viewBox="0 0 34 34" fill="none"><rect x="2" y="6" width="3" height="22" rx="1" fill="white"/><rect x="7" y="6" width="1.5" height="22" fill="white"/><rect x="10" y="6" width="3" height="22" rx="1" fill="white"/><rect x="15" y="6" width="1.5" height="22" fill="white"/><rect x="18" y="6" width="4" height="22" rx="1" fill="white"/><rect x="24" y="6" width="1.5" height="22" fill="white"/><rect x="27" y="6" width="3" height="22" rx="1" fill="white"/></svg>
-      </div>
+      <div class="logo-mark"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><rect x="2" y="6" width="3" height="22" rx="1" fill="white"/><rect x="7" y="6" width="1.5" height="22" fill="white"/><rect x="10" y="6" width="3" height="22" rx="1" fill="white"/><rect x="15" y="6" width="1.5" height="22" fill="white"/><rect x="18" y="6" width="4" height="22" rx="1" fill="white"/><rect x="24" y="6" width="1.5" height="22" fill="white"/><rect x="27" y="6" width="3" height="22" rx="1" fill="white"/></svg></div>
       <div class="logo-text-wrap">
         <div class="logo-name">Z-Bazar <span>AI Helper</span></div>
-        <div class="logo-kurdish">هاریکارێ زاخو بازار یێ ژیر</div>
+        <div class="logo-ku">هاریکارێ زاخو بازار یێ ژیر</div>
       </div>
     </div>
     <div class="top-right">
       <div class="store-badge">Zakho Bazar — زاخو بازار</div>
-      <button class="change-key-btn" onclick="changeKey()">⚙ API Key</button>
+      <button class="key-btn" onclick="changeKey()">⚙ API Key</button>
     </div>
   </div>
 
-  <div class="main-area">
-
+  <div class="main">
     <!-- LEFT -->
-    <div class="left-panel">
-
-      <div class="scan-zone" id="scan-zone" onclick="handleScanZoneClick()">
+    <div class="left">
+      <div class="scan-zone" id="scan-zone" onclick="handleZoneClick()">
         <div class="scan-idle" id="scan-idle">
           <div class="scan-idle-icon">
-            <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
-              <rect x="4" y="10" width="4" height="28" rx="1.5" fill="#0050b4"/>
-              <rect x="10" y="10" width="2" height="28" fill="#0050b4"/>
-              <rect x="14" y="10" width="4" height="28" rx="1.5" fill="#0050b4"/>
-              <rect x="20" y="10" width="2" height="28" fill="#0050b4"/>
-              <rect x="24" y="10" width="5" height="28" rx="1.5" fill="#0050b4"/>
-              <rect x="31" y="10" width="2" height="28" fill="#0050b4"/>
-              <rect x="35" y="10" width="4" height="28" rx="1.5" fill="#0050b4"/>
+            <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+              <rect x="4" y="10" width="4" height="28" rx="1.5" fill="#0032d6"/>
+              <rect x="10" y="10" width="2" height="28" fill="#0032d6"/>
+              <rect x="14" y="10" width="4" height="28" rx="1.5" fill="#0032d6"/>
+              <rect x="20" y="10" width="2" height="28" fill="#0032d6"/>
+              <rect x="24" y="10" width="5" height="28" rx="1.5" fill="#0032d6"/>
+              <rect x="31" y="10" width="2" height="28" fill="#0032d6"/>
+              <rect x="35" y="10" width="4" height="28" rx="1.5" fill="#0032d6"/>
             </svg>
           </div>
           <h2>Scan an item!</h2>
@@ -399,62 +221,62 @@
           <button class="mode-btn stop" onclick="event.stopPropagation();stopScanner()">✕</button>
         </div>
         <div class="manual-wrap" id="manual-wrap">
-          <input type="text" id="manual-barcode" placeholder="Enter barcode..." onkeydown="if(event.key==='Enter')lookupManual()" />
+          <input type="text" id="manual-barcode" placeholder="Enter barcode..." onkeydown="if(event.key==='Enter')lookupManual()"/>
           <button class="btn-go" onclick="event.stopPropagation();lookupManual()">Go →</button>
         </div>
       </div>
 
       <div class="status-bar" id="status-bar"></div>
 
-      <!-- product summary card -->
       <div class="product-card" id="product-card">
         <div class="product-header">
           <div class="product-thumb" id="product-thumb">
-            <svg width="32" height="32" viewBox="0 0 44 44" fill="none" style="opacity:0.25"><rect x="6" y="10" width="4" height="24" rx="1" fill="currentColor"/><rect x="12" y="10" width="2" height="24" fill="currentColor"/><rect x="16" y="10" width="4" height="24" rx="1" fill="currentColor"/><rect x="22" y="10" width="2" height="24" fill="currentColor"/><rect x="26" y="10" width="5" height="24" rx="1" fill="currentColor"/><rect x="33" y="10" width="2" height="24" fill="currentColor"/></svg>
+            <svg width="28" height="28" viewBox="0 0 44 44" fill="none" style="opacity:.2"><rect x="6" y="10" width="4" height="24" rx="1" fill="currentColor"/><rect x="12" y="10" width="2" height="24" fill="currentColor"/><rect x="16" y="10" width="4" height="24" rx="1" fill="currentColor"/><rect x="22" y="10" width="2" height="24" fill="currentColor"/><rect x="26" y="10" width="5" height="24" rx="1" fill="currentColor"/><rect x="33" y="10" width="2" height="24" fill="currentColor"/></svg>
           </div>
-          <div class="product-meta">
+          <div>
             <div class="product-name" id="product-name">—</div>
             <div class="product-sub" id="product-sub"></div>
             <div class="badge-row" id="badge-row"></div>
           </div>
         </div>
-        <button class="scan-again-btn" onclick="resetScanner()">↩ Scan another item</button>
+        <button class="scan-again-btn" onclick="resetAll()">↩ Scan another item</button>
       </div>
-
     </div>
 
     <!-- RIGHT -->
-    <div class="right-panel" id="right-panel">
-
-      <!-- TAGS ROW -->
+    <div class="right" id="right">
       <div class="tags-card">
-        <div class="card-label">Product Tags</div>
-        <div class="tags-row" id="tags-row">
-          <div class="skeleton" style="width:70px;height:28px;border-radius:20px;"></div>
-          <div class="skeleton" style="width:90px;height:28px;border-radius:20px;"></div>
-          <div class="skeleton" style="width:60px;height:28px;border-radius:20px;"></div>
+        <div class="tags-label">Product Tags</div>
+        <div class="tags-row" id="tags-row"><div class="skeleton" style="width:70px;height:26px;border-radius:20px;display:inline-block;"></div><div class="skeleton" style="width:90px;height:26px;border-radius:20px;display:inline-block;margin-left:7px;"></div></div>
+      </div>
+
+      <div class="blurb-card" id="blurb-card">
+        <!-- filled by JS -->
+        <div class="skeleton"></div><div class="skeleton" style="width:80%"></div><div class="skeleton" style="width:60%"></div>
+      </div>
+
+      <div class="chat-section" id="chat-section" style="display:none;">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" placeholder="...پرسیارێک بپرسە" onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="chat-send" id="chat-send" onclick="sendChat()">بپرسە ↑</button>
         </div>
       </div>
-
-      <!-- 2x2 INFO CARDS -->
-      <div class="cards-grid" id="cards-grid">
-        <div class="info-card"><div class="card-label">پێزانین</div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div>
-        <div class="info-card"><div class="card-label">یا خوشە دگال</div><div class="skeleton"></div><div class="skeleton" style="width:55%"></div></div>
-        <div class="info-card"><div class="card-label">هاریکاری</div><div class="skeleton"></div><div class="skeleton"></div></div>
-        <div class="info-card"><div class="card-label">ئەرێ تە دزانی؟</div><div class="skeleton"></div><div class="skeleton" style="width:65%"></div></div>
-      </div>
-
     </div>
   </div>
-
 </div>
 
 <script>
-let apiKey = '', scanning = false, lastScanned = '', scanCooldown = false;
+let apiKey = '';
+let scanning = false;
+let lastScanned = '';
+let scanCooldown = false;
+let currentProduct = null;
+let chatHistory = [];
 
 window.onload = () => {
   const saved = localStorage.getItem('scanai_key');
-  if (saved) { apiKey = saved; document.getElementById('setup-screen').classList.add('hidden'); }
+  if (saved) { apiKey = saved; document.getElementById('setup').classList.add('hidden'); }
 };
 
 function saveKey() {
@@ -462,31 +284,30 @@ function saveKey() {
   if (!val || val.length < 10) { alert('Please enter your Gemini API key.'); return; }
   apiKey = val;
   localStorage.setItem('scanai_key', val);
-  document.getElementById('setup-screen').classList.add('hidden');
+  document.getElementById('setup').classList.add('hidden');
 }
 
 function changeKey() {
   stopScanner(); apiKey = '';
   localStorage.removeItem('scanai_key');
-  document.getElementById('setup-screen').classList.remove('hidden');
-  resetScanner();
+  document.getElementById('setup').classList.remove('hidden');
+  resetAll();
 }
 
-function handleScanZoneClick() { if (!scanning) startScanner(); }
+function handleZoneClick() { if (!scanning) startScanner(); }
 
 function startScanner() {
   scanning = true;
   document.getElementById('scan-idle').style.display = 'none';
   document.getElementById('camera-view').classList.add('active');
   document.getElementById('mode-strip').classList.add('visible');
-  lastScanned = '';
   setStatus('Point camera at a barcode...', '');
 
   Quagga.init({
     inputStream: { name:'Live', type:'LiveStream', target: document.getElementById('quagga-target'), constraints: { width:{ideal:1280}, height:{ideal:480} } },
     decoder: { readers: ['ean_reader','ean_8_reader','upc_reader','upc_e_reader','code_128_reader'] },
     locate: true
-  }, err => { if (err) { setStatus('Camera error — use manual entry', 'error'); stopScannerUI(); switchMode('manual'); } });
+  }, err => { if (err) { setStatus('Camera error — use manual entry','error'); stopScannerUI(); switchMode('manual'); } });
 
   Quagga.start();
   Quagga.onDetected(result => {
@@ -513,7 +334,7 @@ function stopScannerUI() {
 function switchMode(mode) {
   document.getElementById('btn-camera').classList.toggle('active', mode==='camera');
   document.getElementById('btn-manual').classList.toggle('active', mode==='manual');
-  if (mode === 'manual') {
+  if (mode==='manual') {
     document.getElementById('manual-wrap').classList.add('active');
     document.getElementById('camera-view').classList.remove('active');
     try { Quagga.stop(); } catch(e) {}
@@ -527,30 +348,36 @@ function switchMode(mode) {
 
 function lookupManual() {
   const val = document.getElementById('manual-barcode').value.trim();
-  if (!val) return;
-  lookupBarcode(val);
+  if (val) lookupBarcode(val);
 }
 
-function resetScanner() {
-  document.getElementById('right-panel').classList.remove('active');
+function resetAll() {
+  // Full session reset — new user starts fresh
+  currentProduct = null;
+  chatHistory = [];
+  document.getElementById('right').classList.remove('active');
   document.getElementById('product-card').classList.remove('active');
+  document.getElementById('chat-section').style.display = 'none';
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('chat-input').value = '';
   document.getElementById('scan-idle').style.display = 'flex';
   document.getElementById('mode-strip').classList.remove('visible');
   document.getElementById('manual-wrap').classList.remove('active');
   document.getElementById('manual-barcode').value = '';
+  document.getElementById('product-thumb').innerHTML = '<svg width="28" height="28" viewBox="0 0 44 44" fill="none" style="opacity:.2"><rect x="6" y="10" width="4" height="24" rx="1" fill="currentColor"/></svg>';
   setStatus(''); lastScanned = '';
 }
 
 async function lookupBarcode(code) {
+  // Reset previous session immediately
+  resetAll();
   setStatus('Looking up product...','');
-  document.getElementById('right-panel').classList.remove('active');
-  document.getElementById('product-card').classList.remove('active');
 
   let p = null;
   try {
     const r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
     const d = await r.json();
-    if (d.status === 1) p = d.product;
+    if (d.status===1) p = d.product;
   } catch(e) {}
 
   if (!p) {
@@ -563,13 +390,14 @@ async function lookupBarcode(code) {
 
   if (!p) p = { product_name:'Unknown product', barcode:code, _unknown:true };
 
+  currentProduct = p;
   setStatus('Generating AI insights...','');
   renderShell(p);
   await generateAI(p, code);
 }
 
 function renderShell(p) {
-  const name = p.product_name || 'Unknown Product';
+  const name = p.product_name||'Unknown Product';
   const brand = p.brands||'';
   const cat = p.categories ? p.categories.split(',')[0].trim() : '';
   const wt = p.quantity||p.serving_size||'';
@@ -580,31 +408,21 @@ function renderShell(p) {
   if(p.nutriscore_grade) badges.push({label:'Nutri-Score '+p.nutriscore_grade.toUpperCase(),cls:p.nutriscore_grade<='b'?'badge-green':'badge-amber'});
   if(p.ecoscore_grade) badges.push({label:'Eco '+p.ecoscore_grade.toUpperCase(),cls:'badge-blue'});
   if(p.labels_tags?.includes('en:organic')) badges.push({label:'Organic',cls:'badge-green'});
-  if(p.labels_tags?.includes('en:gluten-free')) badges.push({label:'Gluten-free',cls:'badge-green'});
   document.getElementById('badge-row').innerHTML = badges.map(b=>`<span class="badge ${b.cls}">${b.label}</span>`).join('');
 
   const thumb = document.getElementById('product-thumb');
   if(p.image_front_url||p.image_url) thumb.innerHTML=`<img src="${p.image_front_url||p.image_url}" onerror="this.style.display='none'"/>`;
 
-  // show right panel with skeletons
-  document.getElementById('right-panel').classList.add('active');
+  document.getElementById('right').classList.add('active');
   document.getElementById('product-card').classList.add('active');
 
-  document.getElementById('tags-row').innerHTML = `
-    <div class="skeleton" style="width:70px;height:28px;border-radius:20px;"></div>
-    <div class="skeleton" style="width:90px;height:28px;border-radius:20px;"></div>
-    <div class="skeleton" style="width:60px;height:28px;border-radius:20px;"></div>`;
-
-  document.getElementById('cards-grid').innerHTML = `
-    <div class="info-card"><div class="card-label">پێزانین</div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div>
-    <div class="info-card"><div class="card-label">یا خوشە دگال</div><div class="skeleton"></div><div class="skeleton" style="width:55%"></div></div>
-    <div class="info-card"><div class="card-label">هاریکاری</div><div class="skeleton"></div><div class="skeleton"></div></div>
-    <div class="info-card"><div class="card-label">ئەرێ تە دزانی؟</div><div class="skeleton"></div><div class="skeleton" style="width:65%"></div></div>`;
+  document.getElementById('tags-row').innerHTML=`<div class="skeleton" style="width:70px;height:26px;border-radius:20px;display:inline-block;"></div><div class="skeleton" style="width:90px;height:26px;border-radius:20px;display:inline-block;margin-left:7px;"></div>`;
+  document.getElementById('blurb-card').innerHTML=`<div class="skeleton"></div><div class="skeleton" style="width:80%"></div><div class="skeleton" style="width:60%"></div>`;
 }
 
 async function generateAI(p, code) {
   const name = p.product_name||'Unknown product';
-  const brand = p.brands||'Unknown brand';
+  const brand = p.brands||'';
   const category = p.categories||'';
   const ingredients = p.ingredients_text ? p.ingredients_text.substring(0,300) : '';
   const nutri = p.nutriments ? JSON.stringify({
@@ -617,7 +435,7 @@ async function generateAI(p, code) {
     salt:p.nutriments['salt_100g']
   }) : '';
 
-  const prompt = `You are a helpful supermarket assistant AI for Zakho Bazar in Zakho, Kurdistan Region, Iraq.
+  const prompt = `You are the AI assistant for Zakho Bazar supermarket in Zakho, Kurdistan Region, Iraq.
 
 Product:
 - Name: ${name}
@@ -629,56 +447,110 @@ ${nutri?`- Nutrition per 100g: ${nutri}`:''}
 
 Respond ONLY with a valid JSON object (no markdown, no backticks):
 {
-  "tags": [
-    {"label": "tag name in English", "color": "green|blue|amber|purple|red|teal"}
-  ],
-  "insight": "2-3 sentences in Kurdish Badini (Kurmanji, Arabic script)",
-  "pairings": ["item1 in Kurdish", "item2", "item3", "item4", "item5"],
-  "tips": "2-3 tips in Kurdish Badini. Empty string for simple snacks.",
-  "did_you_know": "Interesting fact in Kurdish Badini that encourages purchase. Empty string if nothing compelling.",
-  "also_buy": ["product1 in Kurdish", "product2", "product3"]
+  "tags": [{"label":"tag in English","color":"green|blue|amber|purple|red|teal"}],
+  "insight": "2-3 sentences in Kurdish Badini (Kurmanji, Arabic script) about what this product is and why customers would want it.",
+  "pairings": ["item in Kurdish","item","item","item","item"],
+  "tips": "2-3 tips in Kurdish Badini on how to use, store or serve. Empty string if not applicable.",
+  "did_you_know": "One compelling fact in Kurdish Badini that encourages purchase. Empty string if nothing interesting.",
+  "also_buy": ["product in Kurdish","product","product"]
 }
 
-For tags: be creative and thorough but don't include tags that might discourage the customer from buying the product. Include health tags (Probiotic, Keto-friendly, High Protein, Healthy Fats, Low Sugar, High Fiber, Vegan, Gluten-Free, Organic, Vitamin C, Vitamin D, Calcium, Iron, Antioxidants, Omega-3, etc), diet tags, allergen tags, and lifestyle tags. Include 4-8 relevant tags. Use color: green=healthy/positive, blue=informational, teal=dietary.`;
+Tags: be creative, 4-8 tags. Health (Probiotic, Keto-Friendly, High Protein, Omega-3, Vitamin C, Calcium, Antioxidants, Low Sugar, High Fiber, Vegan, Gluten-Free, Organic), allergens (amber/red), lifestyle (purple/teal). All insight/pairings/tips/did_you_know/also_buy must be in Kurdish Badini Arabic script.`;
 
   try {
     const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
     const res = await fetch(url, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:2500,temperature:0.7} })
+      body: JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:2500,temperature:0.7}})
     });
-    if(!res.ok) { const e=await res.json(); throw new Error(e.error?.message||'API error '+res.status); }
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'API error '+res.status);}
     const data = await res.json();
     const raw = data.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
     const ai = JSON.parse(raw);
-    renderCards(ai);
+
+    // Store context for chat
+    chatHistory = [{
+      role: 'user',
+      parts: [{ text: `Product context: Name: ${name}, Brand: ${brand}, Category: ${category}${ingredients?', Ingredients: '+ingredients:''}${nutri?', Nutrition: '+nutri:''}. The AI already told the customer: "${ai.insight}". Now answer follow-up questions in Kurdish Badini (Kurmanji, Arabic script). Be concise and helpful.` }]
+    }, {
+      role: 'model',
+      parts: [{ text: 'باشە، ئامادەیم بپرسیارا کوستومەر وەڵام بدەم.' }]
+    }];
+
+    renderBlurb(ai);
     setStatus('','');
+    document.getElementById('chat-section').style.display = 'flex';
+    document.getElementById('chat-section').style.flexDirection = 'column';
   } catch(e) {
     console.error(e);
     setStatus('AI insight failed: '+e.message,'error');
-    document.getElementById('cards-grid').innerHTML=`<div class="info-card full-width" style="border-color:rgba(192,57,43,0.3);background:rgba(192,57,43,0.05);"><div class="card-label" style="color:#c0392b;">Error</div><div class="card-content" style="direction:ltr;text-align:left;color:#c0392b;">${e.message}<br><br>• Check your API key<br>• Check internet connection<br>• Press F12 for details</div></div>`;
+    document.getElementById('blurb-card').innerHTML=`<div style="color:#c0392b;font-size:16px;line-height:1.7;">${e.message}<br><br>• Check API key<br>• Check internet<br>• Press F12 for details</div>`;
     document.getElementById('tags-row').innerHTML='';
   }
 }
 
-function renderCards(ai) {
-  // tags
-  const tagColorMap = { green:'tag-green', blue:'tag-blue', amber:'tag-amber', purple:'tag-purple', red:'tag-red', teal:'tag-teal' };
-  document.getElementById('tags-row').innerHTML = (ai.tags||[])
-    .map(t=>`<span class="tag ${tagColorMap[t.color]||'tag-blue'}">${t.label}</span>`).join('');
+function renderBlurb(ai) {
+  const tagColorMap={green:'tag-green',blue:'tag-blue',amber:'tag-amber',purple:'tag-purple',red:'tag-red',teal:'tag-teal'};
+  document.getElementById('tags-row').innerHTML=(ai.tags||[]).map(t=>`<span class="tag ${tagColorMap[t.color]||'tag-blue'}">${t.label}</span>`).join('');
 
-  // cards — 2x2 grid, did_you_know separate from alsoBuy
-  const insight = `<div class="info-card"><div class="card-label">پێزانین</div><div class="card-content">${ai.insight||'—'}</div></div>`;
-  const pairings = `<div class="info-card"><div class="card-label">یا خوشە دگال</div><div class="chip-list">${(ai.pairings||[]).map(p=>`<span class="chip chip-accent">${p}</span>`).join('')}</div></div>`;
-  const alsoBuy = `<div class="info-card"><div class="card-label">کەرەستێن وەکی وێ</div><div class="chip-list">${(ai.also_buy||[]).map(p=>`<span class="chip">${p}</span>`).join('')}</div></div>`;
-  const tips = `<div class="info-card"><div class="card-label">هاریکاری</div><div class="card-content">${ai.tips||'—'}</div></div>`;
-  const didYouKnow = ai.did_you_know ? `<div class="info-card"><div class="card-label">ئەرێ تە دزانی؟</div><div class="card-content">${ai.did_you_know}</div></div>` : `<div class="info-card"><div class="card-label">ئەرێ تە دزانی؟</div><div class="card-content" style="color:var(--muted2);">—</div></div>`;
+  let html = '';
 
-  document.getElementById('cards-grid').innerHTML = insight + pairings + alsoBuy + tips + didYouKnow;
+  if(ai.insight) html += `<div class="section"><div class="section-label">پێزانین</div><div class="section-text">${ai.insight}</div></div><hr class="divider">`;
+
+  if(ai.pairings?.length) html += `<div class="section"><div class="section-label">یا خوشە دگال</div><div class="chip-list">${ai.pairings.map(p=>`<span class="chip chip-accent">${p}</span>`).join('')}</div></div><hr class="divider">`;
+
+  if(ai.tips) html += `<div class="section"><div class="section-label">هاریکاری</div><div class="section-text">${ai.tips}</div></div><hr class="divider">`;
+
+  if(ai.also_buy?.length) html += `<div class="section"><div class="section-label">کەرەستێن وەکی وێ</div><div class="chip-list">${ai.also_buy.map(p=>`<span class="chip">${p}</span>`).join('')}</div></div>`;
+
+  if(ai.did_you_know) html += `<hr class="divider"><div class="section"><div class="section-label">ئەرێ تە دزانی؟</div><div class="section-text">${ai.did_you_know}</div></div>`;
+
+  document.getElementById('blurb-card').innerHTML = html || '<div style="color:var(--muted);">No information available.</div>';
 }
 
-function setStatus(msg,type) {
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg || !chatHistory.length) return;
+
+  input.value = '';
+  document.getElementById('chat-send').disabled = true;
+
+  const messagesEl = document.getElementById('chat-messages');
+  messagesEl.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
+  const thinkingEl = document.createElement('div');
+  thinkingEl.className = 'chat-bubble ai thinking';
+  thinkingEl.textContent = '...';
+  messagesEl.appendChild(thinkingEl);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  chatHistory.push({ role:'user', parts:[{text: msg}] });
+
+  try {
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
+    const res = await fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents: chatHistory, generationConfig:{maxOutputTokens:600,temperature:0.7} })
+    });
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Error');}
+    const data = await res.json();
+    const reply = data.candidates[0].content.parts[0].text.trim();
+    chatHistory.push({ role:'model', parts:[{text:reply}] });
+    thinkingEl.classList.remove('thinking');
+    thinkingEl.textContent = reply;
+  } catch(e) {
+    thinkingEl.classList.remove('thinking');
+    thinkingEl.style.color='#c0392b';
+    thinkingEl.textContent = 'Error: ' + e.message;
+  }
+
+  document.getElementById('chat-send').disabled = false;
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function setStatus(msg,type){
   const el=document.getElementById('status-bar');
   el.textContent=msg;
   el.className='status-bar'+(type?' '+type:'');
@@ -686,4 +558,3 @@ function setStatus(msg,type) {
 </script>
 </body>
 </html>
-
