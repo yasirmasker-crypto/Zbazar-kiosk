@@ -458,7 +458,7 @@ Respond ONLY with a valid JSON object (no markdown, no backticks):
 Tags: be creative, 4-8 tags. Health (Probiotic, Keto-Friendly, High Protein, Omega-3, Vitamin C, Calcium, Antioxidants, Low Sugar, High Fiber, Vegan, Gluten-Free, Organic), allergens (amber/red), lifestyle (purple/teal). All insight/pairings/tips/did_you_know/also_buy must be in Kurdish Badini Arabic script.`;
 
   try {
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key=" + encodeURIComponent(apiKey);
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
     const res = await fetch(url, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
