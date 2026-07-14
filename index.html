@@ -368,6 +368,30 @@ function resetAll() {
   setStatus(''); lastScanned = '';
 }
 
+
+// ── CACHE ──
+const CACHE_KEY_PREFIX = 'zbazar_cache_';
+const CACHE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
+
+function cacheGet(code) {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY_PREFIX + code);
+    if (!raw) return null;
+    const { timestamp, data } = JSON.parse(raw);
+    if (Date.now() - timestamp > CACHE_EXPIRY_MS) {
+      localStorage.removeItem(CACHE_KEY_PREFIX + code);
+      return null;
+    }
+    return data;
+  } catch(e) { return null; }
+}
+
+function cacheSet(code, data) {
+  try {
+    localStorage.setItem(CACHE_KEY_PREFIX + code, JSON.stringify({ timestamp: Date.now(), data }));
+  } catch(e) {}
+}
+
 async function lookupBarcode(code) {
   // Reset previous session immediately
   resetAll();
@@ -458,7 +482,7 @@ Respond ONLY with a valid JSON object (no markdown, no backticks):
 Tags: be creative, 4-8 tags. Health (Probiotic, Keto-Friendly, High Protein, Omega-3, Vitamin C, Calcium, Antioxidants, Low Sugar, High Fiber, Vegan, Gluten-Free, Organic), allergens (amber/red), lifestyle (purple/teal). All insight/pairings/tips/did_you_know/also_buy must be in Kurdish Badini Arabic script.`;
 
   try {
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + encodeURIComponent(apiKey);
     const res = await fetch(url, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -482,6 +506,8 @@ Tags: be creative, 4-8 tags. Health (Probiotic, Keto-Friendly, High Protein, Ome
     setStatus('','');
     document.getElementById('chat-section').style.display = 'flex';
     document.getElementById('chat-section').style.flexDirection = 'column';
+    // Save to cache
+    cacheSet(code, { product: p, ai, chatHistory });
   } catch(e) {
     console.error(e);
     setStatus('AI insight failed: '+e.message,'error');
@@ -528,11 +554,11 @@ async function sendChat() {
   chatHistory.push({ role:'user', parts:[{text: msg}] });
 
   try {
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + encodeURIComponent(apiKey);
     const res = await fetch(url, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ contents: chatHistory, generationConfig:{maxOutputTokens:2500,temperature:0.7} })
+      body: JSON.stringify({ contents: chatHistory, generationConfig:{maxOutputTokens:600,temperature:0.7} })
     });
     if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Error');}
     const data = await res.json();
