@@ -486,7 +486,7 @@ Tags: be creative, 4-8 tags. Health (Probiotic, Keto-Friendly, High Protein, Ome
     const res = await fetch(url, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:2500,temperature:0.7}})
+      body: JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:4000,temperature:0.7}})
     });
     if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'API error '+res.status);}
     const data = await res.json();
@@ -558,7 +558,7 @@ async function sendChat() {
     const res = await fetch(url, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ contents: chatHistory, generationConfig:{maxOutputTokens:600,temperature:0.7} })
+      body: JSON.stringify({ contents: chatHistory, generationConfig:{maxOutputTokens:4000,temperature:0.7} })
     });
     if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Error');}
     const data = await res.json();
